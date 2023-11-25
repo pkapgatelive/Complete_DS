@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Shopping Cart Calculator</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa; /* Light gray background color */
+    }
+
+    .container {
+      margin-top: 50px;
+    }
+
+    .main-card {
+      background-color: #ffffff; /* White background for the main card */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow effect */
+    }
+
+    .card-header {
+      background-color: #007bff; /* Bootstrap primary color for the card header */
+      color: #ffffff; /* Text color for the card header */
+      font-weight: bold;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .item-card {
+      margin-top: 15px;
+    }
+
+    .btn-calculate {
+      background-color: #28a745; /* Bootstrap success color for the calculate button */
+      color: #ffffff; /* Text color for the calculate button */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="main-card">
+          <div class="card-header">
+            <h2 class="text-center">Shopping Cart Calculator</h2>
+          </div>
+          <div class="card-body">
+            <form id="cartForm">
+              <div class="form-group">
+                <label for="itemName">Item Name:</label>
+                <input type="text" class="form-control" id="itemName" name="itemName[]" required>
+              </div>
+              <div class="form-group">
+                <label for="itemValue">Item Value:</label>
+                <input type="number" class="form-control" id="itemValue" name="itemValue[]" required>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="addItem()">Add Item</button>
+              <button type="button" class="btn btn-calculate btn-block mt-3" onclick="sendItems()">Calculate</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div id="itemList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addItem() {
+      const itemList = document.getElementById('itemList');
+      const itemName = document.getElementById('itemName').value;
+      const itemValue = document.getElementById('itemValue').value;
+
+      if (itemName && itemValue) {
+        const newItem = document.createElement('div');
+        newItem.classList.add('item-card', 'card');
+        newItem.innerHTML = `
+          <div class="card-body">
+            <h5 class="card-title">${itemName}</h5>
+            <p class="card-text">Value: ${itemValue}</p>
+          </div>
+        `;
+        itemList.appendChild(newItem);
+
+        // Clear input fields after adding an item
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemValue').value = '';
+      }
+    }
+
+    function sendItems() {
+  const form = document.getElementById('cartForm');
+  const formData = new FormData(form);
+
+  // Create an object to hold the form data
+  const data = {};
+  formData.forEach((value, key) => {
+    // Populate the object with form data
+    data[key] = value;
+  });
+
+  fetch('/calculate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    // Redirect to the result page without waiting for the response
+    window.location.href = '/result';
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+  </script>
+</body>
+
+</html>
